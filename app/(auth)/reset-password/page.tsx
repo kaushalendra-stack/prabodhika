@@ -24,3 +24,4 @@ export const metadata: Metadata = {
 export default function Page() {
   return <ResetPasswordClient />;
 }
+export const dynamic = "force-dynamic";
