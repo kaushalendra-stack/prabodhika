@@ -17,6 +17,36 @@ export default function ResetPasswordClient() {
     const [showConfirmPw, setShowConfirmPw] = useState(false);
     const [loading, setLoading] = useState(false);
 
+
+
+    const [theme, setTheme] = useState<"light" | "dark">("light");
+    useEffect(() => {
+        const detectTheme = () => {
+            const isDark = document.documentElement.classList.contains("dark") ||
+                document.body.classList.contains("dark") ||
+                localStorage.getItem("theme") === "dark";
+            setTheme(isDark ? "dark" : "light");
+        };
+
+        detectTheme();
+
+        const observer = new MutationObserver(detectTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+        window.addEventListener("storage", detectTheme);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener("storage", detectTheme);
+        };
+    }, []);
+
+    const logoSrc = theme === "light" ? "/logo.svg" : "/logo-light.svg";
+
+
+
+
     const handleReset = async () => {
         if (!code || !password || !confirmPassword) {
             alert("Please fill in all fields");
@@ -328,7 +358,7 @@ export default function ResetPasswordClient() {
                 <div className="lp-card">
                     <div className="lp-brand">
                         <span className="lp-brand-name">
-                            <Image src="/logo.svg" width={225} height={100} alt="Prabodhika" />
+                            <Image src={logoSrc} width={225} height={100} alt="Prabodhika" />
                         </span>
                     </div>
 

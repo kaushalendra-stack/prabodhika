@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -14,6 +14,31 @@ export default function RegisterClient() {
     const [showConfirmPw, setShowConfirmPw] = useState(false);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    const [theme, setTheme] = useState<"light" | "dark">("light");
+    useEffect(() => {
+        const detectTheme = () => {
+            const isDark = document.documentElement.classList.contains("dark") ||
+                document.body.classList.contains("dark") ||
+                localStorage.getItem("theme") === "dark";
+            setTheme(isDark ? "dark" : "light");
+        };
+
+        detectTheme();
+
+        const observer = new MutationObserver(detectTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+        window.addEventListener("storage", detectTheme);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener("storage", detectTheme);
+        };
+    }, []);
+
+    const logoSrc = theme === "light" ? "/logo.svg" : "/logo-light.svg";
 
     const handleRegister = async () => {
         // Basic validation
@@ -366,7 +391,7 @@ export default function RegisterClient() {
                     {/* Brand */}
                     <div className="lp-brand">
                         <span className="lp-brand-name">
-                            <Image src="/logo.svg" width={225} height={100} alt="Prabodhika" />
+                            <Image src={logoSrc} width={225} height={100} alt="Prabodhika" />
                         </span>
                     </div>
 

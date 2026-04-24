@@ -3,6 +3,7 @@
 import "../globals.css";
 import { NavbarPublic } from "@/components/NavbarPublic";
 import { FooterPublic } from "@/components/FooterPublic";
+import Footer from "@/components/Footer";
 
 /* ── Prabodhika Homepage ──────────────────────────────────────────────── */
 const C = {
@@ -584,7 +585,7 @@ export default function HomeClient() {
       </section>
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <FooterPublic/>
+      <Footer/>
     </>
   );
 }

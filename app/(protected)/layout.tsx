@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default async function ProtectedLayout({
   children,
@@ -28,6 +29,7 @@ export default async function ProtectedLayout({
     <div className="min-h-screen">
       <Navbar />
       {children}
+      <Footer/> 
     </div>
   );
 }
