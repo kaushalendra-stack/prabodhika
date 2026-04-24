@@ -183,7 +183,7 @@ export default function SearchSelect({
     }
   };
 
-  const createIsActive = activeIndex === results.length && query.trim();
+  const createIsActive = activeIndex === results.length && query.trim().length > 0;
 
   return (
     <>
