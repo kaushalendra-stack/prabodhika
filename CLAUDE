@@ -1,0 +1,132 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Prabodhika is a Next.js study platform for Indian college students — featuring a content hub (PDFs, notes, links), community Q&A with threaded discussions, and a personal dashboard. Authentication supports credentials (email/password), Google, and GitHub.
+
+## Tech Stack
+
+- **Framework**: Next.js 16.2.4 (App Router)
+- **Language**: TypeScript 5 with `@/*` path alias (maps to project root)
+- **Styling**: Tailwind CSS v4 with `@tailwindcss/postcss`
+- **Auth**: NextAuth.js v4 (credentials + OAuth), JWT strategy
+- **Database**: MySQL via `mysql2/promise` connection pool
+- **Email**: External PHP service at `https://mail.protoolvault.in/send-verification.php` (called from API routes with `MAIL_API_KEY` header)
+- **Fonts**: Google Fonts (Yeseva One for display, Outfit for body) loaded via `next/font/google`
+
+## Commands
+
+```bash
+npm run dev      # Start dev server on http://localhost:3000
+npm run build    # Production build
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```
+
+No test framework is configured.
+
+## Architecture
+
+### Route Groups (App Router)
+
+- `app/(public)/` — Public pages: `page.tsx` (homepage with Hero, Features, How It Works, CTA sections), `about/page.tsx`
+- `app/(auth)/` — Auth pages: login, register, verify-email, forgot-password, reset-password (each with a `*Client.tsx` component)
+- `app/(protected)/` — Protected routes: `home/` (dashboard with HomeClient), `upload/` (content upload)
+- `app/complete-profile/` — Profile completion wizard (university → college → course + year) with `CompleteProfileClient.tsx`
+- `app/api/` — API routes (see below)
+
+### Route Protection Flow
+
+The protected layout (`app/(protected)/layout.tsx`) enforces a 3-step gate server-side:
+
+1. **No session** → redirect to `/login`
+2. **Email not verified** → redirect to `/verify-email`
+3. **Profile not completed** → redirect to `/complete-profile`
+
+### Key Files
+
+- `types/next-auth.d.ts` — Extends NextAuth `Session.user` type with `id`, `email_verified`, `profile_completed`
+- `lib/auth.ts` — NextAuth config: providers (Credentials, Google, GitHub), JWT/session callbacks, `signIn` callback for OAuth auto-create
+- `lib/db.ts` — MySQL connection pool (`mysql2/promise`), exported as `db`
+- `lib/requireProfile.ts` — Client-side hook for profile completion enforcement
+- `app/providers.tsx` — Wraps app in `SessionProvider`
+- `app/theme-provider.tsx` — Dark/light theme via Tailwind `dark` class + localStorage
+- `app/layout.tsx` — Root layout: loads fonts, wraps in Providers + ThemeProvider
+- `app/globals.css` — Design tokens, component styles (`.btn-primary`, `.hero-section`, etc.), animations, responsive breakpoints
+
+### Shared Components
+
+- `components/Navbar.tsx` — Authenticated user nav (used in protected layout)
+- `components/NavbarPublic.tsx` — Public nav with mobile hamburger menu
+- `components/Footer.tsx`, `components/FooterPublic.tsx` — Footer variants
+- `components/HeroIllustration.tsx` — SVG illustration for homepage hero
+- `components/SearchSelect.tsx` — Reusable async search/create dropdown. Props: `api` (search endpoint), `createApi` (create endpoint), `extraData` (additional payload), `onSelect` callback, `placeholder`
+
+### Authentication Flow
+
+**Credentials**: Email/password → bcrypt hash comparison → JWT issued
+**OAuth (Google/GitHub)**: OAuth flow → `signIn` callback auto-creates user with `email_verified=true` → JWT issued
+**Session callback** (`lib/auth.ts`): On every session access, fresh user data is fetched from DB to sync `email_verified`, `profile_completed`, and academic profile fields (`university_id`, `college_id`, `course_id`)
+
+### Database Schema (key tables)
+
+**users**: `id, name, email, password, provider, provider_id, verification_code, email_verified (bool), university_id, college_id, course_id, year, profile_completed (bool)`
+
+**universities**, **colleges**, **courses**, **subjects** — Academic reference data (id, name, plus foreign keys where applicable)
+
+**contents** — User-uploaded content (referenced by API routes `api/content/*`)
+
+### API Routes
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `api/auth/[...nextauth]` | GET/POST | NextAuth handler |
+| `api/auth/register` | POST | Register user, generate verification code, call email service |
+| `api/auth/verify-email` | POST | Verify code, set `email_verified=true` |
+| `api/auth/forgot-password` | POST | Trigger password reset email |
+| `api/auth/reset-password` | POST | Update password with bcrypt hash |
+| `api/auth/resend-verification` | POST | Resend verification code |
+| `api/universities` | GET | List universities |
+| `api/colleges` | GET | List colleges (filtered by `university_id`) |
+| `api/courses` | GET | List courses (filtered by `college_id`) |
+| `api/subjects` | GET | List subjects (filtered by `course_id`) |
+| `api/user/complete-profile` | POST | Update user's academic profile |
+| `api/content/create` | POST | Create new content entry |
+| `api/content/check-duplicate` | POST | Check for duplicate content |
+| `api/upload-file` | POST | Handle file uploads |
+| `api/test-db` | GET | Database connectivity test |
+
+## Environment Variables
+
+```env
+# Database
+DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+
+# NextAuth
+NEXTAUTH_SECRET, NEXTAUTH_URL
+
+# OAuth
+GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+GITHUB_ID, GITHUB_SECRET
+
+# Email service
+MAIL_API_KEY
+```
+
+## Design System
+
+Design tokens defined in `app/globals.css` using CSS custom properties (not Tailwind `@theme` directive):
+
+| Token | Light | Dark |
+|-------|-------|------|
+| `--saffron` / `--color-saffron` | `#e8600a` | (unchanged) |
+| `--amber` / `--color-amber-warm` | `#f59e0b` | (unchanged) |
+| `--indigo` / `--color-indigo-deep` | `#1e1b4b` | `#e2e8f0` |
+| `--cream` / `--color-cream` | `#fffbf5` | `#1c1a17` |
+| `--warm-bg` / `--color-warm-bg` | `#fef3e8` | `#2a241f` |
+| `--font-display` | `"Yeseva One", Georgia, serif` | (unchanged) |
+| `--font-body` | `"Outfit", system-ui, sans-serif` | (unchanged) |
+
+Shared CSS classes: `.btn-primary`, `.btn-ghost`, `.hero-section`, `.feature-card`, `.nav-link`, `.mobile-menu`, `.ticker`, `.line-clamp-2`. Animations: `float`, `fadeUp`, `spin-slow`, `marquee`, `slideDown`, `pulse-dot`.
