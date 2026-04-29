@@ -99,7 +99,7 @@ export default function HomeClient({
             </div>
           </div>
 
-          <div className="ph-stat-card">
+          {/* <div className="ph-stat-card">
             <div className="ph-stat-icon ph-stat-icon--uni">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -110,7 +110,7 @@ export default function HomeClient({
               <p className="ph-stat-value">Uni</p>
               <p className="ph-stat-label">Your Network</p>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* ── Search ── */}

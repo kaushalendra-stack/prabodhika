@@ -156,7 +156,7 @@ export default function UploadPage() {
       const data = await res.json();
       if (data.success) {
         setSuccess(true);
-        setTimeout(() => router.push("/dashboard"), 1200);
+        setTimeout(() => router.push("/home"), 1200);
       } else {
         setError(data.error || "Failed to save. Try again?");
       }

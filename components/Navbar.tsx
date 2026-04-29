@@ -417,6 +417,7 @@ const PATHS = {
     upload:   ["M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4","M17 8l-5-5-5 5","M12 3v12"],
     home:     ["M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z","M9 22V12h6v10"],
     chevron:  ["M6 9l6 6 6-6"],
+    search:   ["M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z M21 21l-4.35-4.35"],
 };
 
 const getInitialTheme = () => {
@@ -520,6 +521,9 @@ export default function Navbar() {
                         </Link>
                         <Link href="/upload" className="pb-nav__link" role="listitem">
                             <SvgIcon path={PATHS.upload} size={16} /> Upload
+                        </Link>
+                        <Link href="/search" className="pb-nav__link" role="listitem">
+                            <SvgIcon path={PATHS.search} size={16} /> Search
                         </Link>
                     </div>
 
@@ -630,6 +634,10 @@ export default function Navbar() {
                     <Link href="/upload" className="pb-drawer__link" onClick={() => setMenuOpen(false)}>
                         <span className="pb-drawer__link-icon"><SvgIcon path={PATHS.upload} size={20} /></span>
                         Upload
+                    </Link>
+                    <Link href="/search" className="pb-drawer__link" onClick={() => setMenuOpen(false)}>
+                        <span className="pb-drawer__link-icon"><SvgIcon path={PATHS.search} size={20} /></span>
+                        Search
                     </Link>
                     <Link href="/profile" className="pb-drawer__link" onClick={() => setMenuOpen(false)}>
                         <span className="pb-drawer__link-icon"><SvgIcon path={PATHS.user}   size={20} /></span>

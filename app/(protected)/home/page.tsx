@@ -23,12 +23,12 @@ export default async function HomePage() {
   }
 
   const [personal]: any = await db.query(
-    "SELECT id, title, created_at FROM content WHERE university_id = ? ORDER BY created_at DESC LIMIT 6",
-    [dbUser.university_id]
+    "SELECT id, title, created_at FROM content WHERE university_id = ? AND course_id = ? AND status = 'approved' ORDER BY created_at DESC LIMIT 6",
+    [dbUser.university_id, dbUser.course_id]
   );
 
   const [latest]: any = await db.query(
-    "SELECT id, title, created_at FROM content ORDER BY created_at DESC LIMIT 6"
+    "SELECT id, title, created_at FROM content WHERE status = 'approved' ORDER BY created_at DESC LIMIT 6"
   );
 
   return (
