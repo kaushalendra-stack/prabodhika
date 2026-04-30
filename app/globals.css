@@ -542,7 +542,8 @@ h1, h2, h3, h4,
   line-height: 1.72;
 }
 
-/* ----- Homepage — Audience ----- */
+/* ----- Homepage — Audience Section ----- */
+
 .section-audience {
   padding: 110px 32px;
   background: var(--cream);
